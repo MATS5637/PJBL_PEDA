@@ -1,0 +1,67 @@
+import java.io.*;
+
+public class ComposicaoFerroviaria extends Deque implements Serializable {
+ ObjetoPersistente arqComp;
+
+      public ComposicaoFerroviaria(int N, String nomeArquivo) {
+      super(N); // Chama o construtor de Deque.
+      arqComp = new ObjetoPersistente(nomeArquivo);
+      carregar(); // Carrega arquivo da composição ferroviária se existir.
+      }
+
+      private void salvar() { // Salva a composição ferroviária em arquivo.
+      arqComp.salvar(this);
+      }
+      private void carregar() {
+      ComposicaoFerroviaria cf = (ComposicaoFerroviaria) arqComp.carregar();
+      if (!(cf==null)) { // Se o objeto foi recuperado, atualiza composição ferroviária.
+      // É necessário redefinir os atributos do "deque pai" com os dados da
+      // composição carregada.
+      this.front = cf.front;
+      this.rear = cf.rear;
+      this.ip = cf.ip;
+      this.size = cf.size;
+      this.N = cf.N;
+      this.data = cf.data;
+      }
+      }
+      // retorna o primeiro vagao da composição ou retorna null
+      public Vagao primeiroVagao() {
+            return (Vagao) peekFront();
+      }
+      //retorna o ultimo vagao da composição ou retorna null
+      public Vagao ultimoVagao() {
+            return (Vagao) peekRear();
+      }
+
+      public void criarComposicaoPadrao() { // Monta a composicao padrao do Anexo do PDF.
+            while (!isEmpty())
+                  deleteLast();
+            addLast(new Locomotiva(20, 150, 2500));
+            for (int i = 0; i < 50; i++)
+                  addLast(new Passageiro(24, 40, 30));
+            for (int i = 0; i < 30; i++)
+                  addLast(new Carga(17, 20));
+      salvar();
+      }
+      public int calcularTotalPassageiros() { // Soma os passageiros de todos os vagoes de passageiro.
+            int total = 0;
+            rewind(); // Volta o ponteiro do deque para o inicio.
+            for (int i = 0; i < getSize(); i++) {
+                  Object obj = next(); // Pega o proximo vagao da composicao.
+                  if (obj instanceof Passageiro)
+                        total += ((Passageiro) obj).getPassageiros();
+            }
+            return total;
+      }
+      public double calcularCargaTotal() { // Soma a carga de todos os vagoes de carga.
+            double total = 0;
+            rewind(); // Volta o ponteiro do deque para o inicio.
+            for (int i = 0; i < getSize(); i++) {
+                  Object obj = next(); // Pega o proximo vagao da composicao.
+                  if (obj instanceof Carga)
+            total += ((Carga) obj).getCarga();
+      }
+      return total;
+      }
+}
