@@ -64,4 +64,43 @@ public class ComposicaoFerroviaria extends Deque implements Serializable {
       }
       return total;
       }
+ 
+ public Locomotiva criarLocomotivaIgual() {
+  rewind();
+  for (int i=0; i<getSize(); i++) {
+      Object obj = next();
+   if (obj instanceof Locomotiva) {
+    Locomotiva l = (Locomotiva) obj;
+    return new Locomotiva(l.getComprimento(), l.getPeso(), l.getPotencia());
+   } 
+  }
+  return null;
+ }
+ 
+ private String verificarPotencia(){
+  double potenciaTotal = 0;
+  int qtd = 0;
+  rewind();
+  for (int i=0; i<getSize(); i++){
+  Object obj = next();
+   if (obj instanceof Locomotiva){
+    potenciaTotal += ((Locomotiva) obj).getPotencia();
+    qtd ++;
+   }
+  }
+  if (qtd==0)
+   return "Não há Locomotivas.";
+  double pesoTotal = calcularPesoTotal();
+  double hpt = potenciaTotal/pesoTotal;
+  if (hpt>=1.05)
+   return String.format("Suficiente, já que potência/peso = %.2f .", hpt);
+  double falta = 1.05 * pesoTotal - potenciaTotal;
+  Locomotiva l = criarLocomotivaIgual();
+  double denominador = l.getPotencia() - 1.05 * l.getPeso();
+  if (denominador<=0)
+   return "Uma Locomotiva igual não resolve";
+  int n = (int) Math.ceil(falta/denominador);
+  return String.format("Como a relação HP por tonelada é %.2f , a potência não é suficiente: falta %.2f HP. Então devemos adicionar %d locomotiva(s) iguais.", hpt, falta, n);
+ }
+ 
 }
